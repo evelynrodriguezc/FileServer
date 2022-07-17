@@ -1,69 +1,83 @@
 package main
+
 import (
-	"strings"
+	"fmt"
 	"log"
-    "net"
-    "os"
+	"net"
+	"os"
+	"strings"
 )
 
 const (
-    HOST = "localhost"
-    PORT = "80"
-    TYPE = "tcp"
+	HOST = "localhost"
+	PORT = "5000"
+	TYPE = "tcp"
 )
 
-
 func main() {
-    listen, err := net.Listen(TYPE, HOST+":"+PORT)
+	listen, err := net.Listen(TYPE, HOST+":"+PORT)
+	if err != nil {
+		log.Panic(err)
+		os.Exit(1)
+	}
+	fmt.Println("now listen on", HOST+PORT)
 
-	channels := make(map[string][]string)
-	
-    if err != nil {
-        log.Fatal(err)
-        os.Exit(1)
-    }
-    // close listener
-    defer listen.Close()
-    for {
+	// channels := make(map[string][]string)
+
+	// close listener
+	defer listen.Close()
+	for {
+		conn, err := listen.Accept()
+		if err != nil {
+			log.Fatal(err)
+			os.Exit(1)
+		}
+		defer conn.Close()
+		var remoteAddress string = conn.RemoteAddr().String()
+		fmt.Println(remoteAddress)
+		go handleMessages(conn)
+	}
+}
+
+func joinMessage(arrayMessage []string) string {
+	return strings.Join(arrayMessage, ",")
+}
+
+func splitMessage(commaSeparatedMessage string) []string {
+	return strings.Split(commaSeparatedMessage, ",")
+}
+
+func readMessage(conn net.Conn) string {
+	buffer := make([]byte, 1024)
+	_, err := conn.Read(buffer)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return string(buffer)
+}
+
+func handleMessages(conn net.Conn) {
+	for {
 		response := ""
-		conn, message := waitForActions(listen)
-		opcion := splitMessage(message)
-		println("user: " + opcion[1])
-		switch opcion[0] {
+		message := readMessage(conn)
+		sliceMessage := splitMessage(message)
+		opcion := sliceMessage[0]
+		switch opcion {
 		case "sub":
-			channels[opcion[2]] = append(channels[opcion[2]], opcion[1])
-			response = opcion[1]+" subscribed to "+opcion[2]
+			// channels[opcion[2]] = append(channels[opcion[2]], opcion[1])
+			// response = opcion[1] + " subscribed to " + opcion[2]
+			response = "sub"
 		case "chans":
 			response = "getchannels"
 		case "upload":
 			response = "upload"
 		case "receive":
 			response = "download"
+		default:
+			response = message
 		}
 
-		conn.Write([]byte(response+"\n"))
-		conn.Close()
-    }
-}
-
-func joinMessage(arrayMessage []string) string{
-	return strings.Join(arrayMessage, ",")
-}
-
-func splitMessage(commaSeparatedMessage string)[]string{
-	return strings.Split(commaSeparatedMessage, ",")
-}
-
-func waitForActions(escucha net.Listener) (net.Conn, string){
-	conn, err := escucha.Accept()
-	buffer := make([]byte, 1024)
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
+		conn.Write([]byte(response + "\n"))
+		fmt.Println(response)
 	}
-	_, err = conn.Read(buffer)
-	if err != nil {
-        log.Fatal(err)
-    }
-	return conn, string(buffer)
 }
