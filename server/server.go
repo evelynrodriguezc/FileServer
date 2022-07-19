@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"net"
@@ -49,12 +50,11 @@ func splitMessage(commaSeparatedMessage string) []string {
 }
 
 func readMessage(conn net.Conn) string {
-	buffer := make([]byte, 1024)
-	_, err := conn.Read(buffer)
+	clientMessage, err := bufio.NewReader(conn).ReadString('\n')
 	if err != nil {
 		log.Fatal(err)
 	}
-	return string(buffer)
+	return clientMessage
 }
 
 func handleMessages(conn *net.Conn) {
