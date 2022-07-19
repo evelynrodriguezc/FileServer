@@ -10,8 +10,8 @@ import (
 
 const (
 	HOST = "localhost"
-	PORT = "5000"
-	TYPE = "tcp"
+	PORT = "8081"
+	TYPE = "tcp4"
 )
 
 func main() {
@@ -37,6 +37,9 @@ func sendMessageTo(host string, port string) string {
 			log.Panic(err)
 			continue
 		}
+		if message == "exit" {
+			break
+		}
 
 		_, err = conn.Write([]byte(message)) //envio el mensaje
 		if err != nil {
@@ -50,7 +53,6 @@ func sendMessageTo(host string, port string) string {
 			println("Response from server failed:", err.Error())
 			os.Exit(1)
 		}
-
 	}
 
 	return "nil" //respuesta de el servidor
