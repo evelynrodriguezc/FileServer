@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bufio"
+	"bufio" //?
 	"fmt"
 	"log"
 	"net"
@@ -12,11 +12,11 @@ import (
 const (
 	HOST = "localhost"
 	PORT = "8081"
-	TYPE = "tcp4"
+	TYPE = "tcp4" //why this protocol?
 )
 
 var (
-	channels (map[string][]string) = make(map[string][]string)
+	channels (map[string][]string) = make(map[string][]string) //?
 )
 
 func main() {
@@ -27,7 +27,7 @@ func main() {
 	}
 	fmt.Println("now listen on", HOST+PORT)
 
-	defer listen.Close()
+	defer listen.Close() //defer?
 	for {
 		fmt.Println("ready to listen")
 		conn, err := listen.Accept()
@@ -41,11 +41,11 @@ func main() {
 	}
 }
 
-func joinMessage(arrayMessage []string) string {
-	return strings.Join(arrayMessage, ",")
+func joinMessage(arrayMessage []string) string { //?
+	return strings.Join(arrayMessage, " ")
 }
 
-func splitMessage(commaSeparatedMessage string) []string {
+func splitMessage(commaSeparatedMessage string) []string { //?
 	return strings.Split(commaSeparatedMessage, " ")
 }
 
@@ -57,18 +57,18 @@ func readMessage(conn net.Conn) string {
 	return clientMessage
 }
 
-func handleMessages(conn *net.Conn) {
+func handleMessages(conn *net.Conn) { //arguments?
 	fmt.Println("I'm goint to take the address")
-	var remoteAddress string = (*conn).RemoteAddr().String()
+	var remoteAddress string = (*conn).RemoteAddr().String() //?
 	fmt.Println(remoteAddress)
 	for {
 		response := ""
-		message := readMessage(*conn)
-		sliceMessage := splitMessage(message)
-		opcion := strings.TrimSpace(sliceMessage[0])
+		message := readMessage(*conn)                //?
+		sliceMessage := splitMessage(message)        //?
+		opcion := strings.TrimSpace(sliceMessage[0]) //?
 		fmt.Println("opcion: ", opcion)
 		if opcion == "sub" {
-			channelName := sliceMessage[1]
+			channelName := sliceMessage[1] //slicemessage?
 			fmt.Printf("I'm going to suscribe to the channel %s \n", channelName)
 			channels[channelName] = append(channels[channelName], remoteAddress)
 			response = "sub"
@@ -76,7 +76,7 @@ func handleMessages(conn *net.Conn) {
 			fmt.Println("I'm going to show the channels")
 			for chann := range channels {
 				fmt.Printf("%s: ", chann)
-				for _, address := range channels[chann] {
+				for _, address := range channels[chann] { //how does index work?
 					fmt.Printf(" %s", address)
 				}
 				fmt.Printf("\n")
@@ -86,7 +86,7 @@ func handleMessages(conn *net.Conn) {
 			response = message
 		}
 
-		(*conn).Write([]byte(response + "\n"))
+		(*conn).Write([]byte(response + "\n")) //?
 		fmt.Println(response)
 	}
 }

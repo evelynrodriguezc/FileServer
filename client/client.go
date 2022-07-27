@@ -21,7 +21,7 @@ func main() {
 }
 
 func sendMessageTo(host string, port string) string {
-	conn, err := net.Dial("tcp", host+":"+port) // intento de conneccion al host
+	conn, err := net.Dial("tcp", host+":"+port) // host conn
 	if err != nil {
 		println("Dial failed:", err.Error())
 		os.Exit(1)
@@ -31,7 +31,7 @@ func sendMessageTo(host string, port string) string {
 	fmt.Println("now connected to", HOST+":"+PORT)
 
 	for {
-		message, err := bufio.NewReader(os.Stdin).ReadString('\n')
+		message, err := bufio.NewReader(os.Stdin).ReadString('\n') //?
 
 		if err != nil {
 			log.Panic(err)
@@ -41,19 +41,19 @@ func sendMessageTo(host string, port string) string {
 			break
 		}
 
-		_, err = conn.Write([]byte(message)) //envio el mensaje
+		_, err = conn.Write([]byte(message)) //sends the mss
 		if err != nil {
 			println("Write to server failed:", err.Error())
 			os.Exit(1)
 		}
 
-		respuesta := make([]byte, 1024) //buffer para respuesta
-		_, err = conn.Read(respuesta)   //leo la respuesta del servidor
+		respuesta := make([]byte, 1024) //buffer for response
+		_, err = conn.Read(respuesta)   //reading servers response
 		if err != nil {
 			println("Response from server failed:", err.Error())
 			os.Exit(1)
 		}
 	}
 
-	return "nil" //respuesta de el servidor
+	return "nil" //servers response
 }
