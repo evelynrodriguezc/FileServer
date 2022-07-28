@@ -31,7 +31,7 @@ func sendMessageTo(host string, port string) string {
 	fmt.Println("now connected to", HOST+":"+PORT)
 
 	for {
-		message, err := bufio.NewReader(os.Stdin).ReadString('\n') //?
+		message, err := bufio.NewReader(os.Stdin).ReadString('\n') // reads input
 
 		if err != nil {
 			log.Panic(err)
